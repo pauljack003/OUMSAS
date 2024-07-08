@@ -1,13 +1,13 @@
 # Assignment 5A: Scientific Report Project
 
 # Table of Contents
-- [Introduction](#Introduction_11)
-- [Background](#Background_19)
-- [Research Question/Hypothesis](#Research_QuestionHypothesis_59)
-- [Methodology](#Methodology_65)
-- [Results](#Results_92)
-- [Discussion](#Discussion_123)
-- [Conclusion](#Conclusion_133)
+- [Introduction](#Introduction)
+- [Background](#Background)
+- [Research Question/Hypothesis](#Research_QuestionHypothesis)
+- [Methodology](#Methodology)
+- [Results](#Results)
+- [Discussion](#Discussion)
+- [Conclusion](#Conclusion)
 
 ## Introduction
 
