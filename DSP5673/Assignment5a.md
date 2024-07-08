@@ -104,14 +104,14 @@ The descriptive results seem to suggest a clear increase in affective happiness 
 
 A review of key summary statistics shows that mean happiness increased from 5.504 prior to listening to 6.751 after listening, as shown in the table below.
 
-| Statistic      | ID              | Album             | PriorHappiness | AfterHappiness  |
-|----------------|-----------------|-------------------|----------------|-----------------|
-| Min.           | 1               | Length:5000       | 1.000          | 1.000           |
-| 1st Qu.        | 1251            | Class:character   | 3.000          | 4.000           |
-| Median         | 2500            | Mode:character    | 6.000          | 7.000           |
-| Mean           | 2500            |                   | 5.504          | 6.751           |
-| 3rd Qu.        | 3750            |                   | 8.000          | 10.000          |
-| Max.           | 5000            |                   | 10.000         | 10.000          |
+| Statistic      | PriorHappiness | AfterHappiness  |
+|----------------|----------------|-----------------|
+| Min.           | 1.000          | 1.000           |
+| 1st Qu.        | 3.000          | 4.000           |
+| Median         | 6.000          | 7.000           |
+| Mean           | 5.504          | 6.751           |
+| 3rd Qu.        | 8.000          | 10.000          |
+| Max.           | 10.000         | 10.000          |
 
 A more rigorous t-test of the results shows thet the increase in happiness for each album is, indeed, statistically significant.
 
