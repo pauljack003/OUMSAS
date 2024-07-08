@@ -1,19 +1,23 @@
 # Assignment 5A: Scientific Report Project
 
 # Table of Contents
-- [Introduction](#Introduction_11)
-- [Background](#Background_19)
-- [Research Question/Hypothesis](#Research_QuestionHypothesis_59)
-- [Methodology](#Methodology_65)
-- [Results](#Results_92)
-- [Discussion](#Discussion_123)
-- [Conclusion](#Conclusion_133)
+- [Introduction](#Introduction)
+- [Background](#Background)
+- [Research Question/Hypothesis](#Research-QuestionHypothesis)
+- [Methodology](#Methodology)
+- [Results](#Results)
+- [Discussion](#Discussion)
+- [Conclusion](#Conclusion)
 
 ## Introduction
 
 I'm not really sure what to write about, since the instructions aren't specific: so I'll write a mostly tongue-in-cheek _somewhat scientific report_ about the effects of the listening to [Pearl Jam](https://pearljam.com/), an American rock band that gained massive popularity in the 1990s. 
 
 I'll generate a randomized dataset as if subjects were asked to rate their happiness before and after listening to a Pearl Jam album, and then analyze that (fake) dataset as if the experiment had actually taken place. For this analysis, I'll use R.
+
+I'm also going to ensure I meet the following requirements as laid out in the Assignment, shown below:
+
+![requirements](https://raw.githubusercontent.com/pauljack003/OUMSAS/cdaaab6083b3c007a827e47ead41f45730f89b01/DSP5673/images/Requirements.png)
 
 ---
 
