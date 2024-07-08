@@ -3,7 +3,7 @@
 # Table of Contents
 - [Introduction](#Introduction)
 - [Background](#Background)
-- [Research Question/Hypothesis](#Research_QuestionHypothesis)
+- [Research Question/Hypothesis](#Research-QuestionHypothesis)
 - [Methodology](#Methodology)
 - [Results](#Results)
 - [Discussion](#Discussion)
