@@ -1,4 +1,4 @@
-HI! This repo is basically anything that *isn't* private. I'm not sharing anything related to exams, coursework, or even studies or my own personal notes here. 
+HI! This repo is basically anything that *isn't* private. I'm not sharing anything related to exams, coursework, projects, quizzes, or even studies or my own personal notes here. (**If you want to know what those are like, you can talk to admissions at OU, email a professor, or .... you know, get admitted and pursue the degree yourself!**)
 
 Instead, this repo is used for two, maybe three, purposes:
 
