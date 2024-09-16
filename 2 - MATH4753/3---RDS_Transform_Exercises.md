@@ -1,14 +1,3 @@
----
-title: "R for Data Science - Transform - Exercises"
-author: "Paul Jackson"
-date: "2024-08-30"
-output: 
-  md_document:
-    variant: gfm  # GitHub Flavored Markdown, which supports HTML elements
-    preserve_yaml: true
-    pandoc_args: ["--wrap=none"]  # Avoids line wrapping, preserving inline HTML elements
----
-
 # 12. Logical vectors
 
 ## 12.2.4 Exercises
