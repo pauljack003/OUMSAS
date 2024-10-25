@@ -1,5 +1,8 @@
-## Load data/all_rankings_raw.csv as all_data
+# Load necessary libraries
+library(dplyr)
+library(stringr)
 
+## Load data/all_rankings_raw.csv as all_data
 all_data <- read.csv("data/all_rankings_raw.csv", stringsAsFactors = FALSE)
 
 # Data Cleaning and Transformation
@@ -21,19 +24,19 @@ convert_time_to_seconds <- function(time_str) {
 # Apply the function to convert all time values in the dataset
 all_data$TimeSeconds <- sapply(all_data$Time, convert_time_to_seconds)
 
-# Trim whitespace from character columns
+# Standardize text fields and trim whitespace
 all_data <- all_data %>%
   mutate(
-    Name = str_trim(Name),
-    Location = str_trim(Location),
-    Country = str_trim(Country),
-    Club = str_trim(Club)
+    Name = str_to_lower(str_trim(Name)),
+    Location = str_to_lower(str_trim(Location)),
+    Country = str_to_lower(str_trim(Country)),
+    Club = str_to_lower(str_trim(Club))  # Standardize Club names to lowercase
   )
 
 # Replace empty strings with NA to prevent NULL
 all_data[all_data == ""] <- NA
 
-# Save the combined data to a CSV file (optional)
+# Save the cleaned data (optional)
 write.csv(all_data, "data/all_rankings_cleaned.csv", row.names = FALSE)
 
 # Data Normalization
@@ -52,7 +55,7 @@ events <- all_data %>%
   arrange(Season, Distance, Gender) %>%
   mutate(EventID = row_number())
 
-# Create Clubs table
+# Create Clubs table (handle duplicates)
 clubs <- all_data %>%
   select(Club) %>%
   distinct() %>%
