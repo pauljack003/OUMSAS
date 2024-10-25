@@ -79,7 +79,7 @@ write.csv(events, "data/events.csv", row.names = FALSE)
 write.csv(clubs, "data/clubs.csv", row.names = FALSE)
 write.csv(results, "data/results.csv", row.names = FALSE)
 
-# Optional: Print sample data to verify
+# Print sample data to verify
 print("Sample Athletes Data:")
 print(head(athletes))
 
