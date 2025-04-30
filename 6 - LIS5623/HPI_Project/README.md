@@ -37,7 +37,8 @@ All data used is publicly available and has been cleaned and merged for reproduc
 ## How to Reproduce
 
 1. Clone this repo.
-2. Run the .R scripts in numerical order (1 through 5) to:
+2. Unzip the compressed data files and move them to the main project directory.
+3. Run the .R scripts in numerical order (1 through 5) to:
    - Preprocess data
    - Calculate PTI
    - Classify ZIP codes
