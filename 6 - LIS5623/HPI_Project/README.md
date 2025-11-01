@@ -7,9 +7,8 @@ This project investigates patterns of housing market mispricing across U.S. ZIP 
 Many housing markets in the U.S. appear misaligned with local income levels. This project aims to classify ZIP codes as:
 - Overvalued
 - Undervalued
-- Fairly Valued
 
-based on the Price-to-Income Ratio (PTI), using Zillow housing price data and demographic and economic features from the U.S. Census American Community Survey (ACS).
+based on the Price-to-Income Ratio (PTI), using Zillow housing price data and demographic and economic features from the U.S. Census American Community Survey (ACS). From there, I train and deploy two machine learning models (Random Forest, XGBoost) to explore the association of various economic, demographic, and structural features with mispricing behavior. Findings appear to be highly relevant to policymakers as well as investors and lenders.
 
 ## Project Structure
 
@@ -37,7 +36,8 @@ All data used is publicly available and has been cleaned and merged for reproduc
 ## How to Reproduce
 
 1. Clone this repo.
-2. Run the .R scripts in numerical order (1 through 5) to:
+2. Unzip the compressed data files and move them to the main project directory.
+3. Run the .R scripts in numerical order (1 through 5) to:
    - Preprocess data
    - Calculate PTI
    - Classify ZIP codes
