@@ -1,0 +1,455 @@
+---
+title: "Data Workings"
+author: "Paul Jackson"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+We have a tidy dataset, tidy_report1.csv, as shown below:
+
+```{r}
+report1 <- read.csv("tidy_report1.csv")
+head(report1)
+str(report1)
+summary(report1)
+```
+
+## Treatment level summaries
+
+```{r}
+library(dplyr)
+
+report1 %>%
+  group_by(Treatment) %>%
+  summarise(
+    MeanPassed   = mean(AmountPassed),
+    MedianPassed = median(AmountPassed),
+    MeanReturned = mean(AmountReturned),
+    MedianReturned = median(AmountReturned),
+    MeanBuyerEarn = mean(BuyerEarnings),
+    MeanSellerEarn = mean(SellerEarnings),
+    .groups = "drop"
+  )
+```
+
+## Distributional Analysis
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# ---------------- Shared styling ----------------
+# Okabe–Ito palette (color-blind safe)
+col_pass   <- "#0072B2"  # blue
+col_return <- "#D55E00"  # vermillion
+col_buyer  <- "#0072B2"  # blue
+col_seller <- "#D55E00"  # vermillion
+
+theme_report <- theme_minimal(base_size = 13) +
+  theme(
+    plot.title  = element_text(face = "bold", size = 14),
+    axis.title  = element_text(face = "bold"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(color = "#e5e5e5"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    axis.line    = element_line(color = "black"),
+    axis.ticks   = element_line(color = "black")
+  )
+
+# ---------------- 1) Histogram: Amount Passed ----------------
+ggplot(report1, aes(x = AmountPassed)) +
+  geom_histogram(binwidth = 1, fill = col_pass, color = "black") +
+  labs(
+    title = "Distribution of Amounts Passed",
+    x = "Amount Passed ($)",
+    y = "Frequency"
+  ) +
+  theme_report
+
+# ---------------- 2) Histogram: Amount Returned ----------------
+ggplot(report1, aes(x = AmountReturned)) +
+  geom_histogram(binwidth = 2, fill = col_return, color = "black") +
+  labs(
+    title = "Distribution of Amounts Returned",
+    x = "Amount Returned ($)",
+    y = "Frequency"
+  ) +
+  theme_report
+
+# ---------------- 3) Stripchart: Buyer Earnings ----------------
+# autoscale the y-limit to remove extra whitespace
+max_stack_b <- max(table(report1$BuyerEarnings))
+stripchart(report1$BuyerEarnings,
+           method = "stack", at = 0, pch = 16,  # solid dots (works in B/W)
+           col = col_buyer, cex = 1.1,
+           main = "Buyer Earnings Distribution",
+           xlab = "Earnings ($)",
+           ylab = "Count",
+           ylim = c(0, max_stack_b + 2))
+
+# ---------------- 4) Stripchart: Seller Earnings ----------------
+max_stack_s <- max(table(report1$SellerEarnings))
+stripchart(report1$SellerEarnings,
+           method = "stack", at = 0, pch = 16,   # hollow dots (distinct in B/W)
+           col = col_seller, cex = 1.1,
+           main = "Seller Earnings Distribution",
+           xlab = "Earnings ($)",
+           ylab = "Count",
+           ylim = c(0, max_stack_s + 2))
+```
+
+## Plots by treatment
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(ggpattern)
+
+# Choose a color-blind-safe palette for color displays
+pal_treat <- c(T1 = "#0072B2", T2 = "#009E73", T3 = "#D55E00")
+pal_role  <- c(BuyerEarnings = "#0072B2", SellerEarnings = "#D55E00")
+
+# 1) Average Amount Passed by Treatment  ------------------------------
+report1 %>%
+  group_by(Treatment) %>%
+  summarise(MeanPassed = mean(AmountPassed), .groups = "drop") %>%
+  ggplot(aes(x = Treatment, y = MeanPassed,
+             fill = Treatment, pattern = Treatment)) +
+  geom_col_pattern(
+    color = "black",
+    pattern_fill = "black",
+    pattern_density = 0.15,
+    pattern_spacing = 0.04
+  ) +
+  scale_fill_manual(values = pal_treat) +
+  # one distinct pattern per treatment (works in B/W)
+  scale_pattern_manual(values = c(T1 = "stripe", T2 = "circle", T3 = "crosshatch")) +
+  labs(title = "Average Amount Passed by Treatment",
+       x = "Treatment", y = "Average Amount Passed") +
+  theme_minimal() + theme(legend.position = "none")
+
+# 2) Average Amount Returned by Treatment  ----------------------------
+report1 %>%
+  group_by(Treatment) %>%
+  summarise(MeanReturned = mean(AmountReturned), .groups = "drop") %>%
+  ggplot(aes(x = Treatment, y = MeanReturned,
+             fill = Treatment, pattern = Treatment)) +
+  geom_col_pattern(
+    color = "black",
+    pattern_fill = "black",
+    pattern_density = 0.15,
+    pattern_spacing = 0.04
+  ) +
+  scale_fill_manual(values = pal_treat) +
+  scale_pattern_manual(values = c(T1 = "stripe", T2 = "circle", T3 = "crosshatch")) +
+  labs(title = "Average Amount Returned by Treatment",
+       x = "Treatment", y = "Average Amount Returned") +
+  theme_minimal() + theme(legend.position = "none")
+
+# 3) Average Buyer vs Seller Earnings by Treatment  -------------------
+report1 %>%
+  group_by(Treatment) %>%
+  summarise(BuyerEarnings  = mean(BuyerEarnings),
+            SellerEarnings = mean(SellerEarnings), .groups = "drop") %>%
+  tidyr::pivot_longer(c(BuyerEarnings, SellerEarnings),
+                      names_to = "Role", values_to = "AvgEarnings") %>%
+  ggplot(aes(x = Treatment, y = AvgEarnings,
+             fill = Role, pattern = Role)) +
+  geom_col_pattern(position = position_dodge(width = 0.8),
+                   color = "black",
+                   pattern_fill = "black",
+                   pattern_density = 0.15,
+                   pattern_spacing = 0.05) +
+  scale_fill_manual(values = pal_role, name = "Role",
+                    labels = c("Buyer", "Seller")) +
+  # two distinct patterns for greyscale
+  scale_pattern_manual(values = c(BuyerEarnings = "stripe",
+                                  SellerEarnings = "crosshatch"),
+                       name = "Role",
+                       labels = c("Buyer", "Seller")) +
+  labs(title = "Average Buyer and Seller Earnings by Treatment",
+       x = "Treatment", y = "Average Earnings") +
+  theme_minimal()
+```
+
+## Outliers general
+
+```{r}
+find_z_outliers <- function(x, threshold = 3) {
+  z <- scale(x)
+  which(abs(z) > threshold)
+}
+
+report1[find_z_outliers(report1$AmountReturned), ]
+report1[find_z_outliers(report1$BuyerEarnings), ]
+report1[find_z_outliers(report1$SellerEarnings), ]
+report1[find_z_outliers(report1$AmountPassed), ]
+```
+
+## Outliers by treatment
+
+```{r}
+library(dplyr)
+
+# Function: flag z-score outliers within each Treatment
+find_z_outliers_by_treatment <- function(df, var, threshold = 3) {
+  df %>%
+    group_by(Treatment) %>%
+    mutate(z = scale(.data[[var]])) %>%
+    filter(abs(z) > threshold) %>%
+    select(-z)
+}
+
+# Run for each key variable
+out_passed  <- find_z_outliers_by_treatment(report1, "AmountPassed")
+out_return  <- find_z_outliers_by_treatment(report1, "AmountReturned")
+out_buyer   <- find_z_outliers_by_treatment(report1, "BuyerEarnings")
+out_seller  <- find_z_outliers_by_treatment(report1, "SellerEarnings")
+
+# Optional: combine results with a source column
+out_all <- bind_rows(
+  Passed  = out_passed,
+  Returned = out_return,
+  Buyer   = out_buyer,
+  Seller  = out_seller,
+  .id = "Variable"
+)
+
+out_all
+```
+
+## Outlier plots
+
+```{r}
+library(ggplot2)
+
+ggplot(report1, aes(x = Treatment, y = AmountReturned)) +
+  geom_boxplot(outlier.colour = "red", outlier.shape = 16) +
+  labs(title = "Outliers in Amount Returned by Treatment",
+       x = "Treatment", y = "Amount Returned ($)") +
+  theme_minimal()
+
+ggplot(report1, aes(x = Treatment, y = BuyerEarnings)) +
+  geom_boxplot(outlier.colour = "red", outlier.shape = 16) +
+  labs(title = "Outliers in Buyer Earnings by Treatment",
+       x = "Treatment", y = "Buyer Earnings ($)") +
+  theme_minimal()
+
+ggplot(report1, aes(x = Treatment, y = SellerEarnings)) +
+  geom_boxplot(outlier.colour = "red", outlier.shape = 16) +
+  labs(title = "Outliers in Seller Earnings by Treatment",
+       x = "Treatment", y = "Seller Earnings ($)") +
+  theme_minimal()
+```
+
+### MAIN EFFECTS
+
+FINAL MODEL 1 is below.
+
+```{r eval= FALSE}
+
+# MODEL 1: Amount Passed with lagged return
+
+library(brms)
+
+# Prepare data: scale to proportions for ZOIB
+df_lag <- report1 %>%
+  arrange(BuyerID, RoundGlobal) %>%
+  group_by(BuyerID) %>%
+  mutate(ReturnLag = lag(AmountReturned)) %>%
+  ungroup() %>%
+  mutate(p_pass = AmountPassed / 10)  # proportion in [0,1]
+
+# Fit Model 1: Amount Passed
+fit_pass_lagged <- brm(
+  bf(
+    p_pass ~ Treatment + ReturnLag + (1 | BuyerID),  # regression on Treatment + lag
+    zoi ~ 1,  # zero-inflation part (prob of passing nothing)
+    coi ~ 1   # one-inflation part (prob of passing all $10)
+  ),
+  data   = df_lag,
+  family = zero_one_inflated_beta(),
+  prior  = c(
+    prior(normal(0, 1), class = "b"),                     # Treatment + lag coefficients
+    prior(exponential(2), class = "phi"),                 # Beta precision
+    prior(normal(0, 1), class = "Intercept", dpar = "zoi"), # logit prob at 0
+    prior(normal(0, 1), class = "Intercept", dpar = "coi")  # logit prob at 1
+  ),
+  chains  = 4, iter = 4000, cores = 4,
+  control = list(adapt_delta = 0.99, max_treedepth = 15),
+  seed = 42
+)
+
+summary(fit_pass_lagged)
+pp_check(fit_pass_lagged, type = "dens_overlay")
+
+
+```
+
+MODEL 1 PLOTS
+
+```{r eval= FALSE}
+
+# Main plot visualization
+
+library(tidybayes)
+library(ggplot2)
+
+posterior_samples(fit_pass_lagged) %>%
+  select(starts_with("b_")) %>%
+  pivot_longer(everything(), names_to = "parameter", values_to = "value") %>%
+  ggplot(aes(x = value, y = parameter, fill = parameter)) +
+  stat_halfeye(.width = 0.95, point_interval = median_qi) +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  labs(title = "Posterior Distributions with 95% Credible Intervals",
+       x = "Coefficient Value", y = "Parameter") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# general plot
+# Plot all population-level (fixed) effects with 95% CrI
+plot(fit_pass_lagged, pars = "^b_", prob = 0.95)
+
+# Marginal effects of passing
+me <- conditional_effects(fit_pass_lagged, effects = "Treatment")
+plot(me)
+
+# Conditional effect, slopes of ReturnLag
+ce <- conditional_effects(fit_pass_lagged, effects = "ReturnLag")
+plot(ce)
+
+```
+
+MODEL 2 FINAL is below.
+
+```{r eval= FALSE}
+
+library(dplyr)
+
+df_lag <- report1 %>%
+  arrange(SellerID, RoundGlobal) %>%
+  group_by(SellerID) %>%
+  mutate(PassLag = lag(AmountPassed)) %>%
+  ungroup()
+
+fit_return_lagged <- brm(
+  bf(
+    AmountReturned ~ Treatment + PassLag + (1 | SellerID)  # Gamma mean
+  ),
+  data   = df_lag,
+  family = hurdle_gamma(link = "log"),
+  prior  = c(
+    prior(normal(0, 1), class = "b"),        # treatment + lag effects
+    prior(normal(0, 1), class = "Intercept"),# baseline return
+    prior(exponential(2), class = "shape")   # Gamma shape (precision)
+  ),
+  chains = 4, iter = 4000, cores = 4,
+  control = list(adapt_delta = 0.99, max_treedepth = 15),
+  seed = 42
+)
+```
+
+MODEL 2 PLOTS
+
+```{r eval= FALSE}
+# Main plot visualization
+
+library(tidybayes)
+library(ggplot2)
+
+posterior_samples(fit_return_lagged) %>%
+  select(starts_with("b_"), starts_with("hu")) %>%  # include hu & shape
+  pivot_longer(everything(), names_to = "parameter", values_to = "value") %>%
+  ggplot(aes(x = value, y = parameter, fill = parameter)) +
+  stat_halfeye(.width = 0.95, point_interval = median_qi) +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  labs(
+    title = "Posterior Distributions with 95% Credible Intervals",
+    x = "Coefficient Value",
+    y = "Parameter"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+### BUYER vs SELLER COMPARISON PLOT
+
+THis plot is used in the creation of the client-facing report.
+
+```{r eval= FALSE}
+library(tidyverse)
+library(brms)
+
+# --- Helper functions ---
+invlogit <- function(x) 1 / (1 + exp(-x))
+summarise_effect <- function(x) {
+  tibble(
+    EstimatePct = median(x),
+    lwr_pct = quantile(x, 0.025),
+    upr_pct = quantile(x, 0.975)
+  )
+}
+
+# --- Posterior draws ---
+draws_pass   <- posterior_samples(fit_pass_lagged)
+draws_return <- posterior_samples(fit_return_lagged)
+
+# --- Buyer back-transform (% change vs baseline) ---
+buyer_base <- invlogit(draws_pass$b_Intercept)
+
+buyer_t2_pct  <- (invlogit(draws_pass$b_Intercept + draws_pass$b_TreatmentT2) / buyer_base - 1) * 100
+buyer_t3_pct  <- (invlogit(draws_pass$b_Intercept + draws_pass$b_TreatmentT3) / buyer_base - 1) * 100
+buyer_rec_pct <- (invlogit(draws_pass$b_Intercept + draws_pass$b_ReturnLag) / buyer_base - 1) * 100
+
+# --- Seller back-transform (% change vs baseline) ---
+seller_base <- exp(draws_return$b_Intercept)
+
+seller_t2_pct  <- (exp(draws_return$b_Intercept + draws_return$b_TreatmentT2) / seller_base - 1) * 100
+seller_t3_pct  <- (exp(draws_return$b_Intercept + draws_return$b_TreatmentT3) / seller_base - 1) * 100
+seller_rec_pct <- (exp(draws_return$b_Intercept + draws_return$b_PassLag) / seller_base - 1) * 100
+
+# --- Summaries ---
+buyer_t2_sum  <- summarise_effect(buyer_t2_pct)  %>% mutate(Theme = "Familiarity (T2 vs T1)", Role = "Buyer")
+buyer_t3_sum  <- summarise_effect(buyer_t3_pct)  %>% mutate(Theme = "Higher incentive (T3 vs T1)", Role = "Buyer")
+buyer_rec_sum <- summarise_effect(buyer_rec_pct) %>% mutate(Theme = "Reciprocity", Role = "Buyer")
+
+seller_t2_sum  <- summarise_effect(seller_t2_pct)  %>% mutate(Theme = "Familiarity (T2 vs T1)", Role = "Seller")
+seller_t3_sum  <- summarise_effect(seller_t3_pct)  %>% mutate(Theme = "Higher incentive (T3 vs T1)", Role = "Seller")
+seller_rec_sum <- summarise_effect(seller_rec_pct) %>% mutate(Theme = "Reciprocity", Role = "Seller")
+
+effect_summary <- bind_rows(
+  buyer_t2_sum, buyer_t3_sum, buyer_rec_sum,
+  seller_t2_sum, seller_t3_sum, seller_rec_sum
+)
+
+# --- Plot ---
+ggplot(effect_summary,
+       aes(x = Theme, y = EstimatePct, fill = Role)) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_col(position = position_dodge(width = 0.7), width = 0.6) +
+  geom_errorbar(
+    aes(ymin = lwr_pct, ymax = upr_pct),
+    position = position_dodge(width = 0.7),
+    width = 0.2,
+    colour = "gray40"
+  ) +
+  coord_flip() +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  labs(
+    title = "How Familiarity and Incentives Shape Buyer and Seller Behavior",
+    x = NULL,
+    y = "Percent change vs baseline",
+    fill = NULL
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    legend.position = "bottom",
+    panel.grid.major.y = element_blank()
+  )
+
+```
+
