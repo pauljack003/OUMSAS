@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-We have a tidy dataset, tidy_report1.csv, as shown below:
+Need to have the core dataset, tidy_report1.csv. 
 
 ```{r}
 report1 <- read.csv("tidy_report1.csv")
